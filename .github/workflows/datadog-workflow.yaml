@@ -10,6 +10,8 @@ jobs:
         name: Install and configure Datadog in the GKE cluster.
         runs-on: ubuntu-latest
         steps:
+            - name: Checkout repo
+              uses: actions/checkout@master
             - name: Install gcloud authentication plugin
               run: |
                 REPO_URL="https://packages.cloud.google.com/apt"
@@ -34,8 +36,17 @@ jobs:
                 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
                 chmod 700 get_helm.sh
                 ./get_helm.sh
+            - name: Update cluster name & datadog api key values in datadog-values.yml
+              uses: cschleiden/replace-tokens@v1
+              with:
+                files: '["./datadog-values.yml"]'
+                tokenPrefix: __
+                tokenSuffix: __
+              env:
+                DATADOG_API_KEY_SECRET: ${{ secrets.DATADOG_API_KEY_SECRET }}
+                CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
             - name: Deploy the datadog agent
               run: |
                 helm repo add datadog https://helm.datadoghq.com
                 helm repo update
-                helm install datadog-v1.0 -f datadog-values.yaml --set datadog.site='datadoghq.com' --set datadog.apiKey=${{ secrets.DATADOG_API_KEY_SECRET }} datadog/datadog
+                helm install datadog-v1.0 -f datadog-values.yml --set datadog.site='datadoghq.com' --set datadog.apiKey=${{ secrets.DATADOG_API_KEY_SECRET }} datadog/datadog
