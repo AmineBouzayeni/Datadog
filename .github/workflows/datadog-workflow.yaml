@@ -9,9 +9,22 @@ jobs:
     InstallAndConfigureDatadog:
         name: Install and configure Datadog in the GKE cluster.
         runs-on: ubuntu-latest
+        permissions: write-all
         steps:
             - name: Checkout repo
               uses: actions/checkout@master
+            - name: Create Release
+              id: create_release
+              uses: actions/create-release@latest
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+              with:
+                tag_name: ${{ vars.CURRENT_VERSION }}
+                release_name: Release ${{ vars.CURRENT_VERSION }}
+                body: |
+                  App version ${{ vars.CURRENT_VERSION }}.
+                draft: false
+                prerelease: false
             - name: Install gcloud authentication plugin
               run: |
                 REPO_URL="https://packages.cloud.google.com/apt"
@@ -49,4 +62,5 @@ jobs:
               run: |
                 helm repo add datadog https://helm.datadoghq.com
                 helm repo update
-                helm install datadog --set datadog.site='datadoghq.com' --set datadog.apiKey=${{ secrets.DATADOG_API_KEY_SECRET }} datadog/datadog
+                helm uninstall datadog-*
+                helm install datadog-${{ vars.CURRENT_VERSION }} --set datadog.site='datadoghq.com' --set datadog.apiKey=${{ secrets.DATADOG_API_KEY_SECRET }} datadog/datadog
