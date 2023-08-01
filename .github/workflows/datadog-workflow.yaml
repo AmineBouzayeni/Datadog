@@ -57,10 +57,10 @@ jobs:
                 tokenSuffix: __  
               env:
                 DATADOG_API_KEY_SECRET: ${{ secrets.DATADOG_API_KEY_SECRET }}
-                CLUSTER_NAME: ${{ env.CLUSTER_NAME }}
             - name: Deploy the datadog agent
               run: |
                 helm repo add datadog https://helm.datadoghq.com
                 helm repo update
+                helm ls --short --filter 'datadog' | xargs -L1 helm delete
                 currentVersion=$(echo ${{ vars.CURRENT_VERSION }} | sed s/./-/g)
-                helm install datadog-$currentVersion --set datadog.site='datadoghq.com' --set datadog.apiKey=${{ secrets.DATADOG_API_KEY_SECRET }} datadog/datadog
+                helm install datadog-$currentVersion -f datadog-values.yml datadog/datadog
