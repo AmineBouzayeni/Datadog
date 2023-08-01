@@ -1,28 +1,17 @@
 targetSystem: "linux"
 datadog:
-  # apiKey: <DATADOG_API_KEY>
-  # appKey: <DATADOG_APP_KEY>
-  # If not using secrets, then use apiKey and appKey instead
-  apiKeyExistingSecret: __DATADOG_API_KEY_SECRET__
-  appKeyExistingSecret: __DATADOG_APP_KEY_SECRET__
-  clusterName: __CLUSTER_NAME__
-  tags: []
-  # datadog.kubelet.tlsVerify should be `false` on kind and minikube
-  # to establish communication with the kubelet
-  # kubelet:
-    # tlsVerify: "false"
+  confd: # {}
+    openmetrics.yaml: |-
+      init_config:
+      instances:
+      # The prometheus endpoint to query from
+      - prometheus_url: http://webui-service:80/metrics
+        namespace: "webui-apm"
+        metrics:
+          - "*"
+  site: 'datadoghq.eu'
+  apiKey: __DATADOG_API_KEY_SECRET__
   logs:
     enabled: true
-    containerCollectAll: true
+    containerCollectAll: false
     containerCollectUsingFiles: true
-  # apm:
-  #   portEnabled: true
-  #   socketPath: /var/run/datadog/apm.socket
-  #   hostSocketPath: /var/run/datadog/
-  # processAgent:
-  #   enabled: true
-  #   processCollection: false
-  # systemProbe:
-  #   enableTCPQueueLength: false
-  #   enableOOMKill: true
-  #   collectDNSStats: false
