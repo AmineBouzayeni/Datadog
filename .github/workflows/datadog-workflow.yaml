@@ -25,7 +25,7 @@ jobs:
                 tag_name: ${{ vars.CURRENT_VERSION }}
                 release_name: Release ${{ vars.CURRENT_VERSION }}
                 body: |
-                  App version ${{ vars.CURRENT_VERSION }}.
+                  Datadog release ${{ vars.CURRENT_VERSION }}.
                 draft: false
                 prerelease: false
             - name: Install gcloud authentication plugin
