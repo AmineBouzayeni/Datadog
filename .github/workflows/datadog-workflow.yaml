@@ -1,6 +1,9 @@
 name: Datadog Installation and configuration Pipeline
 run-name: Datadog Installation and configuration Pipeline
-on: [push]
+on: 
+  push:
+    branches:
+      - 'main'
 env:
     CLUSTER_NAME: dockercoins-cluster-teo
     CLUSTER_ZONE: europe-west1-b
